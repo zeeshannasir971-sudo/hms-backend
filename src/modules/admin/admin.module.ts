@@ -32,4 +32,3 @@ import { Staff, StaffSchema } from '../../common/schemas/staff.schema';
   controllers: [AdminController],
   exports: [AdminService],
 })
-export class AdminModule {}
