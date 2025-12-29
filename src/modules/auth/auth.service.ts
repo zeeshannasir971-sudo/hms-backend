@@ -7,6 +7,7 @@ import { User, UserDocument } from '../../common/schemas/user.schema';
 import { Patient, PatientDocument } from '../../common/schemas/patient.schema';
 import { Doctor, DoctorDocument } from '../../common/schemas/doctor.schema';
 import { Staff, StaffDocument } from '../../common/schemas/staff.schema';
+import { AdminInitService } from '../../common/services/admin-init.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -18,6 +19,7 @@ export class AuthService {
     @InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>,
     @InjectModel(Staff.name) private staffModel: Model<StaffDocument>,
     private jwtService: JwtService,
+    private adminInitService: AdminInitService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -222,6 +224,13 @@ export class AuthService {
 
   async resetPassword(email: string) {
     try {
+      // Check if this is a protected admin account
+      const isProtectedAdmin = await this.adminInitService.isProtectedAdmin(email);
+      if (isProtectedAdmin) {
+        // Don't reveal that this is a protected admin account
+        return { message: 'If an account with this email exists, a reset code has been sent.' };
+      }
+
       // Find user (exclude admin users)
       const user = await this.userModel.findOne({ 
         email, 
@@ -261,6 +270,12 @@ export class AuthService {
 
   async confirmResetPassword(email: string, resetCode: string, newPassword: string) {
     try {
+      // Check if this is a protected admin account
+      const isProtectedAdmin = await this.adminInitService.isProtectedAdmin(email);
+      if (isProtectedAdmin) {
+        throw new UnauthorizedException('Invalid or expired reset code');
+      }
+
       // Find user with valid reset token (exclude admin users)
       const user = await this.userModel.findOne({
         email,

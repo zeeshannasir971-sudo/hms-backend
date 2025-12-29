@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
+import { AdminInitService } from '../../common/services/admin-init.service';
 import { User, UserSchema } from '../../common/schemas/user.schema';
 import { Patient, PatientSchema } from '../../common/schemas/patient.schema';
 import { Doctor, DoctorSchema } from '../../common/schemas/doctor.schema';
@@ -25,8 +26,8 @@ import { Staff, StaffSchema } from '../../common/schemas/staff.schema';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy, AdminInitService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, AdminInitService],
 })
 export class AuthModule {}

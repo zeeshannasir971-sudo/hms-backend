@@ -61,6 +61,9 @@ export class User {
   @Prop()
   verificationToken: string;
 
+  @Prop({ default: false })
+  isProtected: boolean; // For hardcoded admin accounts that cannot be deleted or modified
+
   @Prop({
     type: {
       canManageUsers: { type: Boolean, default: false },
